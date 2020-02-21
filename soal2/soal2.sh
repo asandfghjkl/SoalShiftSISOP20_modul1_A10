@@ -4,6 +4,6 @@
 password=$( cat  /dev/urandom | tr -dc '[:alnum:]' | fold -w 28 | head -n 1 )
 
 #2b) menyimpan password ke file dg nama sesuai argumen (HANYA alphabets yang akan diolah dari argument)
-filename=$( echo $1 | sed 's/[[:digit:]]//g' )
+filename=$( echo $1 | tr -dc '[:alpha:]' )
 echo $password > $filename.txt
 

@@ -1,10 +1,8 @@
 #!/bin/bash
 
 #2d deskripsi berdasarkan jam dibuatnya file di argumen
-filename=$( echo $1 | sed 's/[[:digit:]]//g' )
-encrypted=$filename
-
-filename=$( echo $filename | sed 's/\.txt//g' )
+filename=$( echo $1 | sed 's/\.txt//g' )
+encrypted=$filename.txt
 
 upper='A-Z'
 lower='a-z'

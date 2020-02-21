@@ -1,8 +1,7 @@
 #!/bin/bash
 
 #2c enkripsi berdasarkan jam dibuatnya file di argument
-filename=$( echo $1 | sed 's/[[:digit:]]//g' )
-filename=$( echo $filename | sed 's/\.txt//g' )
+filename=$( echo $1 | sed 's/\.txt//g' )
 
 hour=$( date -r $filename.txt +"%H" )
 case "$hour" in
