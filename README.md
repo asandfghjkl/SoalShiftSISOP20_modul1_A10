@@ -9,10 +9,91 @@
 * [soal3](https://github.com/asandfghjkl/SoalShiftSISOP20_modul1_A10#soal3)
 
 ## soal1
-source code:
+source code: [soal1.sh](https://github.com/asandfghjkl/SoalShiftSISOP20_modul1_A10/blob/master/soal1/soal1.sh)
 
 ### penyelesaian & penjelasan soal
+Dari file “Sample-Superstore.tsv”, kemudian diminta laporan berupa:
 
+**1a) Tentukan wilayah bagian (region) mana yang memiliki keuntungan (profit) paling
+sedikit**
+```
+a=$( awk -F '\t' '{if (NR>1) profit[$13]+=$21;}
+END{min=10000000; for (i in profit) { 
+	if (min > profit[i]){
+		min=profit[i]; 
+		region=i}
+}print region}' Sample-Superstore.tsv )
+echo "a) region dengan profit paling sedikit ialah $a"
+```
+* `awk -F '\t'` untuk membaca isi file Sample-Superstore.tsv digunakan default \t atau tab untuk memisahkan tiap kolom
+* `{if (NR>1) profit[$13]+=$21;}` baris pertama file karena berisi nama kolom, maka akan dilewati. untuk tiap-tiap baris selanjutnya dicek untuk masing-masing region ($13) dihitung profitnya ($21)
+* di bagian `END` 
+	* dideklarasikan `min` dengan angka besar
+	* kemudian untuk masing-masing profit, dicek satu sama lain apakah `min > profit[i]` 
+	* apabila iya, maka `min` diganti profit region tersebut, dan region tersebut disimpan di `region`
+* `print region` hasil region dengan profit minimum kemudian dikeluarkan
+* `a` merupakan variabel untuk menyimpan hasil region dengan profit paling sedikit hasil `awk`
+* `echo "a) region dengan profit paling sedikit ialah $a"` kemudian hasil dikeluarkan 
+
+**1b) Tampilkan 2 negara bagian (state) yang memiliki keuntungan (profit) paling
+sedikit berdasarkan hasil poin a**
+
+```
+b=$( awk -F '\t' -v region="$a" '{if (NR>1) {if ($13 ~ region) profit[$11]+=$21;}} 
+END{min1=1000000; min2=10000000; for (i in profit) {
+		if (min1 > profit[i] || min2 > profit[i]){
+		if (min2 > profit[i] && min1 < profit[i]){ min2=profit[i]; state2=i}
+		else{ min2=min1;
+			min1=profit[i]; 
+                	state2=state1;
+			state1=i}}
+}print state1 " " state2}' Sample-Superstore.tsv )
+
+echo "b) 2 state di region $a dengan profit terendah ialah "
+for state in $b
+do 
+	echo "-"$state
+done
+```
+* `awk -F '\t'` untuk membaca isi file Sample-Superstore.tsv digunakan default \t atau tab untuk memisahkan tiap kolom
+* `-v region="$a"` untuk mendeklarasikan variabel region hasil dari soal 1a
+* `{if (NR>1) {if ($13 ~ region) profit[$11]+=$21;}}` baris pertama file karena berisi nama kolom, maka akan dilewati. untuk tiap-tiap baris selanjutnya dicek untuk region ($13) yang sama dengan hasil soal 1a (Central) maka akan dihitung profit ($21) untuk masing-masing state ($11)
+* di bagian `END` 
+	* dideklarasikan `min1` dan `min2` dengan angka besar
+	* kemudian untuk masing-masing profit per state, dicek satu sama lain apakah `min1 > profit[i] || min2 > profit[i]` 
+	* apabila iya, kemudian diperiksa kembali apakah `min2 > profit[i] && min1 < profit[i]` jika iya, `min2` diganti dengan profit tersebut, dan state2 diganti state tersebut 
+	* apabila tidak, `min2=min1; min1=profit[i]; state2=state1; state1=i` 
+* `print state1 " " state2` keluarkan hasil 2 state dengan profit terendah
+* `b` merupakan variabel untuk menyimpan hasil 2 state dengan profit paling sedikit hasil `awk`
+* `echo "b) 2 state di region $a dengan profit terendah ialah "` kemudian kedua state dikeluarkan, `for state in $b do echo "-"$state done` 
+
+**1c) Tampilkan 10 produk (product name) yang memiliki keuntungan (profit) paling
+sedikit berdasarkan 2 negara bagian (state) hasil poin b**
+
+---revisi---
+```
+state=($b)
+
+c=$( awk -F '\t' -v state1=${state[0]} -v state2=${state[1]} '{if (NR>1) {if ($11 ~ state1 || $11 ~ state2) profit[$17]+=$21;}} 
+END{ for(ps in profit) {
+	print profit[ps], ps}
+}' Sample-Superstore.tsv | sort -g | head -10 )
+echo -e "c) 10 produk dengan profit terendah di ${state[0]} dan ${state[1]} ialah \n$c"
+```
+* `state=($b)` hasil dari soal b kemudian disimpan dalam array state
+* `awk -F '\t'` untuk membaca isi file Sample-Superstore.tsv digunakan default \t atau tab untuk memisahkan tiap kolom
+* `-v state1=${state[0]} -v state2=${state[1]}` untuk mendeklarasikan variabel `state1` dan `state2` hasil dari soal 1b
+* `{if (NR>1) {if ($11 ~ state1 || $11 ~ state2) profit[$17]+=$21;}}` baris pertama file karena berisi nama kolom, maka akan dilewati. untuk tiap-tiap baris selanjutnya dicek apabila state sama dengan hasil state soal 1b maka akan dihitung profit ($21) untuk masing-masing produk ($17)
+* di bagian `END` 
+	* `for(ps in profit) {print profit[ps], ps}` untuk setiap profit produk akan dikeluarkan
+* `sort -g` untuk sorting hasil profit masing-masing produk
+* `head -10` untuk mengeluarkan 10 baris hasil sorting
+* `c` merupakan variabel untuk menyimpan hasil 10 produk dengan profit paling sedikit hasil `awk`
+* `echo -e "c) 10 produk dengan profit terendah di ${state[0]} dan ${state[1]} ialah \n$c"` kemudian hasil kesepuluh produk dikeluarkan. `-e` disini untuk enable `\n`
+
+**kendala**
+- soal 1c belum selesai, maka perlu revisi
+- revisi print state1 state2 soal 1b
 
 ## soal2
 source code:
@@ -216,3 +297,4 @@ rm a.rgba b.rgba
 ```
 
 **kendala**
+- tidak menggunakan `awk`
