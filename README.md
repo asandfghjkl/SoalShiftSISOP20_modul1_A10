@@ -23,7 +23,7 @@ END{min=10000000; for (i in profit) {
 		min=profit[i]; 
 		region=i}
 }print region}' Sample-Superstore.tsv )
-echo "a) region dengan profit paling sedikit ialah $a"
+echo -e "a) region dengan profit paling sedikit:\n$a"
 ```
 * `awk -F '\t'` untuk membaca isi file Sample-Superstore.tsv digunakan default \t atau tab untuk memisahkan tiap kolom
 * `{if (NR>1) profit[$13]+=$21;}` baris pertama file karena berisi nama kolom, maka akan dilewati. untuk tiap-tiap baris selanjutnya dicek untuk masing-masing region ($13) dihitung profitnya ($21)
@@ -33,7 +33,7 @@ echo "a) region dengan profit paling sedikit ialah $a"
 	* apabila iya, maka `min` diganti profit region tersebut, dan region tersebut disimpan di `region`
 * `print region` hasil region dengan profit minimum kemudian dikeluarkan
 * `a` merupakan variabel untuk menyimpan hasil region dengan profit paling sedikit hasil `awk`
-* `echo "a) region dengan profit paling sedikit ialah $a"` kemudian hasil dikeluarkan 
+* `echo -e "a) region dengan profit paling sedikit:\n$a"` kemudian hasil dikeluarkan. `-e` untuk enable `\n` 
 
 **1b) Tampilkan 2 negara bagian (state) yang memiliki keuntungan (profit) paling
 sedikit berdasarkan hasil poin a**
@@ -49,10 +49,10 @@ END{min1=1000000; min2=10000000; for (i in profit) {
 			state1=i}}
 }print state1 " " state2}' Sample-Superstore.tsv )
 
-echo "b) 2 state di region $a dengan profit terendah ialah "
+echo "b) 2 state di region $a dengan profit terendah: "
 for state in $b
 do 
-	echo "-"$state
+	echo $state
 done
 ```
 * `awk -F '\t'` untuk membaca isi file Sample-Superstore.tsv digunakan default \t atau tab untuk memisahkan tiap kolom
@@ -65,7 +65,7 @@ done
 	* apabila tidak, `min2=min1; min1=profit[i]; state2=state1; state1=i` 
 * `print state1 " " state2` keluarkan hasil 2 state dengan profit terendah
 * `b` merupakan variabel untuk menyimpan hasil 2 state dengan profit paling sedikit hasil `awk`
-* `echo "b) 2 state di region $a dengan profit terendah ialah "` kemudian kedua state dikeluarkan, `for state in $b do echo "-"$state done` 
+* `echo "b) 2 state di region $a dengan profit terendah: "` kemudian kedua state dikeluarkan, `for state in $b do echo $state done` 
 
 **1c) Tampilkan 10 produk (product name) yang memiliki keuntungan (profit) paling
 sedikit berdasarkan 2 negara bagian (state) hasil poin b**
@@ -77,8 +77,8 @@ state=($b)
 c=$( awk -F '\t' -v state1=${state[0]} -v state2=${state[1]} '{if (NR>1) {if ($11 ~ state1 || $11 ~ state2) profit[$17]+=$21;}} 
 END{ for(ps in profit) {
 	print profit[ps], ps}
-}' Sample-Superstore.tsv | sort -g | head -10 )
-echo -e "c) 10 produk dengan profit terendah di ${state[0]} dan ${state[1]} ialah \n$c"
+}' Sample-Superstore.tsv | sort -g | head -10 | cut -d " " -f2- )
+echo -e "c) 10 produk dengan profit terendah di ${state[0]} dan ${state[1]}:\n$c"
 ```
 * `state=($b)` hasil dari soal b kemudian disimpan dalam array state
 * `awk -F '\t'` untuk membaca isi file Sample-Superstore.tsv digunakan default \t atau tab untuk memisahkan tiap kolom
@@ -88,8 +88,9 @@ echo -e "c) 10 produk dengan profit terendah di ${state[0]} dan ${state[1]} iala
 	* `for(ps in profit) {print profit[ps], ps}` untuk setiap profit produk akan dikeluarkan
 * `sort -g` untuk sorting hasil profit masing-masing produk
 * `head -10` untuk mengeluarkan 10 baris hasil sorting
+* `cut -d " " -f2-` untuk menghapus hasil profit, dan menyisakan nama produk
 * `c` merupakan variabel untuk menyimpan hasil 10 produk dengan profit paling sedikit hasil `awk`
-* `echo -e "c) 10 produk dengan profit terendah di ${state[0]} dan ${state[1]} ialah \n$c"` kemudian hasil kesepuluh produk dikeluarkan. `-e` disini untuk enable `\n`
+* `echo -e "c) 10 produk dengan profit terendah di ${state[0]} dan ${state[1]}:\n$c"` kemudian hasil kesepuluh produk dikeluarkan. `-e` disini untuk enable `\n`
 
 **kendala**
 - soal 1c belum selesai, maka perlu revisi
