@@ -6,7 +6,7 @@ END{min=10000000; for (i in profit) {
 		min=profit[i]; 
 		region=i}
 }print region}' Sample-Superstore.tsv )
-echo "a) region dengan profit paling sedikit ialah $a"
+echo -e "a) region dengan profit paling sedikit:\n$a"
 
 b=$( awk -F '\t' -v region="$a" '{if (NR>1) {if ($13 ~ region) profit[$11]+=$21;}} 
 END{min1=1000000; min2=10000000; for (i in profit) {
@@ -18,10 +18,10 @@ END{min1=1000000; min2=10000000; for (i in profit) {
 			state1=i}}
 }print state1 " " state2}' Sample-Superstore.tsv )
 
-echo "b) 2 state di region $a dengan profit terendah ialah "
+echo "b) 2 state di region $a dengan profit terendah: "
 for state in $b
 do 
-	echo "-"$state
+	echo $state
 done
 
 state=($b)
@@ -29,5 +29,5 @@ state=($b)
 c=$( awk -F '\t' -v state1=${state[0]} -v state2=${state[1]} '{if (NR>1) {if ($11 ~ state1 || $11 ~ state2) profit[$17]+=$21;}} 
 END{ for(ps in profit) {
 	print profit[ps], ps}
-}' Sample-Superstore.tsv | sort -g | head -10 )
-echo -e "c) 10 produk dengan profit terendah di ${state[0]} dan ${state[1]} ialah \n$c"
+}' Sample-Superstore.tsv | sort -g | head -10 | cut -d " " -f2-)
+echo -e "c) 10 produk dengan profit terendah di ${state[0]} dan ${state[1]}:\n$c"
